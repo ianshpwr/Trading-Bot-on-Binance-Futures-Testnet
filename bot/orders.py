@@ -37,6 +37,7 @@ class OrderManager:
             "side": side,
             "type": "MARKET",
             "quantity": self._format_decimal(quantity),
+            "newOrderRespType": "RESULT",
         }
         response = self.client.post("/fapi/v1/order", params)
         self.logger.debug("Raw MARKET order response: %s", response)
@@ -86,20 +87,39 @@ class OrderManager:
             quantity,
         )
         params = {
+            "algoType": "CONDITIONAL",
             "symbol": symbol,
             "side": side,
             "type": "STOP",
             "quantity": self._format_decimal(quantity),
             "price": self._format_decimal(price),
-            "stopPrice": self._format_decimal(stop_price),
+            "triggerPrice": self._format_decimal(stop_price),
             "timeInForce": time_in_force,
+            "newOrderRespType": "RESULT",
         }
-        response = self.client.post("/fapi/v1/order", params)
+        response = self.client.post("/fapi/v1/algoOrder", params)
         self.logger.debug("Raw STOP order response: %s", response)
-        self.logger.info("Order success: orderId=%s status=%s", response.get("orderId"), response.get("status"))
+        self.logger.info(
+            "Order success: orderId=%s status=%s",
+            response.get("algoId"),
+            response.get("algoStatus"),
+        )
         return self._to_order_result(response)
 
     def _to_order_result(self, response: dict[str, Any]) -> OrderResult:
+        if "algoId" in response:
+            return OrderResult(
+                order_id=int(response["algoId"]),
+                symbol=str(response["symbol"]),
+                side=str(response["side"]),
+                order_type=str(response["orderType"]),
+                status=str(response["algoStatus"]),
+                quantity=float(response["quantity"]),
+                executed_qty=0.0,
+                avg_price=float(response.get("price", 0) or 0),
+                raw_response=response,
+            )
+
         return OrderResult(
             order_id=int(response["orderId"]),
             symbol=str(response["symbol"]),
