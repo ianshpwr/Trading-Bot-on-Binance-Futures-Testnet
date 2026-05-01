@@ -1,0 +1,32 @@
+
+Usage / Run Examples: 
+
+# Market BUY
+python cli.py place-order --symbol BTCUSDT --side BUY --type MARKET --quantity 0.001
+
+# Limit SELL
+python cli.py place-order --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.001 --price 50000
+
+# Stop-Limit BUY
+python cli.py place-order --symbol BTCUSDT --side BUY --type STOP --quantity 0.001 --price 45000 --stop-price 44500
+
+# Help
+python cli.py --help
+
+
+
+trading_bot/
+├── bot/
+│   ├── __init__.py              # Empty init
+│   ├── client.py                # Binance REST API wrapper for auth, signing, and HTTP requests
+│   ├── orders.py                # Order construction and placement logic
+│   ├── validators.py            # Input validation rules only
+│   └── logging_config.py        # Shared logger configuration
+├── logs/
+│   └── trading_bot.log          # Auto-created rotating log file
+├── cli.py                       # Typer CLI entry point
+├── .env                         # Local API credentials
+├── .env.example                 # Safe environment template
+├── .gitignore                   # Git ignore rules
+├── README.md                    # Project documentation
+└── requirements.txt             # Python dependencies
